@@ -4,9 +4,10 @@ import { BREWERIES, QUERIES } from '../types';
 import { getAndParse, transformQueriesToRequests } from './helpers.routes';
 
 /**
- * 
- * @param req 
- * @param res 
+ * @description handler for the '/breweries' end point.
+ * @description accepts queries: city, postal, name, state, type, sort
+ * @param req express.Request
+ * @param res express.Response
  */
 export const breweriesHandler = async (req : express.Request, res : express.Response) : Promise<void> => {
   try {

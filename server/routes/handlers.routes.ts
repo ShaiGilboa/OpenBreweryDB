@@ -3,7 +3,7 @@ import ReqProm from 'request-promise';
 
 import { api } from '../constants';
 import { BREWERIES, QUERIES } from '../types';
-import { arrangeMultipleQueries, getAndParse, transformQueriesToRequests } from './helpers.routes';
+import { reduceMultipleQueries, getAndParse, transformQueriesToRequests } from './helpers.routes';
 
 /**
  * @description handler for the '/breweries' end point.
@@ -22,10 +22,12 @@ export const breweriesHandler = async (req : express.Request, res : express.Resp
       console.log('resp.length', resp[0].length)
       console.log('resp.length', resp[1].length)
       //change to reducer function
-      const ret : BREWERIES = arrangeMultipleQueries(resp)
+      const ret : BREWERIES = reduceMultipleQueries(resp)
       res.json({})
     } else {
-      const breweries : BREWERIES = await getAndParse(`${api}/breweries`)
+      const breweries : BREWERIES = await getAndParse(`${api}/breweries?per_page=50`)
+      console.log('breweries', breweries)
+      console.log('breweries.length', breweries.length)
       res.json({breweries})
     }
   } catch (error) {

@@ -10,9 +10,20 @@ import { QUERIES_INDEX, BREWERIES, BREWERY } from '../types';
  */
 export const getAndParse = async (url : string) : Promise<any> => {
   try {
-    const stringify : string = await ReqProm(url);
-    const json : any = await JSON.parse(stringify);
-    return json;
+    const ret : BREWERIES = []
+    let stringify : string = await ReqProm(url);
+    let json : any = await JSON.parse(stringify);
+    ret.push(...json);
+    console.log('ret', ret.length)
+    let page : number = 1;
+    while (json.length === 50) {
+      let stringify : string = await ReqProm(`${url}&page=${page}`);
+      let json : any = await JSON.parse(stringify);
+      ret.push(...json);
+      console.log('ret.length', ret.length)
+      page++;
+    }
+    return ret;
   } catch (error) {
     console.log('error in getAndParse', error)
     return ;
@@ -45,7 +56,7 @@ export const transformQueriesToRequests = (queries : QUERIES) : string[] => {
   return ret
 }
 
-export const arrangeMultipleQueries = (unorganized : BREWERIES[]) : BREWERIES => {
+export const reduceMultipleQueries = (unorganized : BREWERIES[]) : BREWERIES => {
   const ret : BREWERIES = [];
   unorganized.forEach((response : BREWERIES) => {
     response.forEach((brewery : BREWERY) => (!ret.some((aBrewery : BREWERY) => aBrewery.id === brewery.id)) && ret.push(brewery))

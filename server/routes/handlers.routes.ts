@@ -21,6 +21,7 @@ export const breweriesHandler = async (req : express.Request, res : express.Resp
       console.log('resp', resp)
       console.log('resp.length', resp[0].length)
       console.log('resp.length', resp[1].length)
+      //change to reducer function
       const ret : BREWERIES = arrangeMultipleQueries(resp)
       res.json({})
     } else {

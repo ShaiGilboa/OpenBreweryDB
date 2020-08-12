@@ -1,21 +1,21 @@
-import request from 'request-promise';
-import { QUERIES } from 'types';
-import { QUERIES_INDEX } from '../types';
+import * as express from 'express';
+import { api } from '../constants';
+import { BREWERIES, QUERIES } from '../types';
+import { getAndParse, transformQueriesToRequests } from './helpers.routes';
 
-export const getAndParse = async (url : string) : Promise<any> => {
+export const breweriesHandler = async (req : express.Request, res : express.Response) : Promise<void> => {
   try {
-    const stringify : string = await request(url);
-    const json : any = await JSON.parse(stringify);
-    return json;
+    if (req.query) {
+      console.log('req.query', req.query)
+      const queries : QUERIES = req.query;
+      const requests : string[] = transformQueriesToRequests(queries);
+      res.json({})
+    } else {
+      const breweries : BREWERIES = await getAndParse(`${api}/breweries`)
+      res.json({breweries})
+    }
   } catch (error) {
-    console.log('error in getAndParse', error)
-    return ;
+    console.log('error in /breweries', error);
+    res.status(500).send();
   }
-}
-
-export const transformQueriesToRequests = (queries : QUERIES) : string[] => {
-  let ret = ['', '']
-  const requests = {};
-  Object.entries(queries).forEach(([key, value]) => console.log('key, value', key, value))
-  return ret
 }

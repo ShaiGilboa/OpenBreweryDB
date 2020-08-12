@@ -1,6 +1,7 @@
-import request from 'request-promise';
+import { api } from '../constants';
+import ReqProm from 'request-promise';
 import { QUERIES } from 'types';
-import { QUERIES_INDEX } from '../types';
+import { QUERIES_INDEX, BREWERIES, BREWERY } from '../types';
 
 /**
  * @description returns a JOSN object from a get-url
@@ -9,7 +10,7 @@ import { QUERIES_INDEX } from '../types';
  */
 export const getAndParse = async (url : string) : Promise<any> => {
   try {
-    const stringify : string = await request(url);
+    const stringify : string = await ReqProm(url);
     const json : any = await JSON.parse(stringify);
     return json;
   } catch (error) {
@@ -24,18 +25,31 @@ export const getAndParse = async (url : string) : Promise<any> => {
  * @return JSON object with desired breweries
  */
 export const transformQueriesToRequests = (queries : QUERIES) : string[] => {
-  let ret = ['', '']
-  const requests = {};
+  const ret : string[] = [];
   Object.entries(queries).forEach(([key, value]) => {
     switch(typeof value) {
       case 'string':
-        return
+        ret.push(`${api}/breweries?${key}=${value}`);
+        break;
       case 'object':
-        return
+        value.forEach((aValue : string) => {
+          ret.push(`${api}/breweries?${key}=${aValue}`)
+        });
+        break;
       default:
         throw new Error(" ");
         
     }
   })
+  console.log('ret', ret)
   return ret
+}
+
+export const arrangeMultipleQueries = (unorganized : BREWERIES[]) : BREWERIES => {
+  const ret : BREWERIES = [];
+  unorganized.forEach((response : BREWERIES) => {
+    response.forEach((brewery : BREWERY) => (!ret.some((aBrewery : BREWERY) => aBrewery.id === brewery.id)) && ret.push(brewery))
+  })
+  console.log('ret', ret.length)
+  return ret;
 }

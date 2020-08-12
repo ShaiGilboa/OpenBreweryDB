@@ -17,11 +17,11 @@ export interface BREWERY {
 export type BREWERIES = BREWERY[];
 
 export interface QUERIES {
-  city?: string[] | string,
-  name?: string,
-  state?: string[] | string,
-  postal?: string[] | string,
-  type?: string[] | string,
+  by_city?: string[] | string,
+  by_name?: string,
+  by_state?: string[] | string,
+  by_postal?: string[] | string,
+  by_type?: string[] | string,
   sort?: string,
 }
 

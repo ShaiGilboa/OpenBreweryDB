@@ -1,4 +1,4 @@
-import * as request from 'request-promise';
+import * as RequestPromise from 'request-promise';
 import * as express from 'express';
 import { api } from '../constants';
 import { BREWERIES, QUERIES } from '../types';

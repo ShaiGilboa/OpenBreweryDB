@@ -3,6 +3,11 @@ import { api } from '../constants';
 import { BREWERIES, QUERIES } from '../types';
 import { getAndParse, transformQueriesToRequests } from './helpers.routes';
 
+/**
+ * 
+ * @param req 
+ * @param res 
+ */
 export const breweriesHandler = async (req : express.Request, res : express.Response) : Promise<void> => {
   try {
     if (req.query) {

@@ -14,7 +14,7 @@ export const getAndParse = async (url : string) : Promise<any> => {
     let stringify : string = await ReqProm(url);
     let json : any = await JSON.parse(stringify);
     ret.push(...json);
-    console.log('ret', ret.length)
+    console.log('ret', ret.length )
     let page : number = 1;
     while (json.length === 50) {
       let stringify : string = await ReqProm(`${url}&page=${page}`);

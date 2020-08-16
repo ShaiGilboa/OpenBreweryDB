@@ -1,7 +1,8 @@
-import { api } from '../constants';
+import { api, PER_PAGE } from '../constants';
 import ReqProm from 'request-promise';
 import { QUERIES } from 'types';
-import { QUERIES_INDEX, BREWERIES, BREWERY } from '../types';
+import { QUERIES_INDEX, BREWERIES, BREWERY, LOCATIONS_TYPES } from '../types';
+import { type } from 'os';
 
 /**
  * @description returns a JOSN object from a get-url
@@ -15,14 +16,6 @@ export const getAndParse = async (url : string) : Promise<any> => {
     let json : any = await JSON.parse(stringify);
     ret.push(...json);
     console.log('ret', ret.length )
-    let page : number = 1;
-    while (json.length === 50) {
-      let stringify : string = await ReqProm(`${url}&page=${page}`);
-      let json : any = await JSON.parse(stringify);
-      ret.push(...json);
-      console.log('ret.length', ret.length)
-      page++;
-    }
     return ret;
   } catch (error) {
     console.log('error in getAndParse', error)
@@ -31,29 +24,65 @@ export const getAndParse = async (url : string) : Promise<any> => {
 }
 
 /**
- * @description returns Object of the breweries after ALL queries 
- * @param queries the objects of queries
- * @return JSON object with desired breweries
+ * @description seperates the queries into types, and locations
+ * @param info { locations: string[], types : string[] } - will be the requests for the locations, and the types
+ * @param page '${number}` - the page we are asking for
+ * @param key - filer by this key
+ * @param value - the value of the filter key
  */
-export const transformQueriesToRequests = (queries : QUERIES) : string[] => {
-  const ret : string[] = [];
+const orsOrAnds = (info : LOCATIONS_TYPES, page: string, key: string, value: string) : void => {
+  const { locations, types } = info;
+  switch (key) {
+    case 'by_type':
+      types.push(`&by_type=${value}`);
+      break;
+    case 'by_city':
+    case 'by_postal':
+    case 'by_state':
+    case 'by_postal':
+      locations.push(`${api}/breweries?${key}=${value}&per_page=${PER_PAGE}&page=${page}`);
+      break;
+    default:
+      //error
+  }
+}
+
+const destructorQueries = (queries : QUERIES, page: string) : LOCATIONS_TYPES => {
+  const locations: string[] = [];
+  const types: string[] = [];
   Object.entries(queries).forEach(([key, value]) => {
     switch(typeof value) {
       case 'string':
-        ret.push(`${api}/breweries?${key}=${value}`);
+        orsOrAnds({locations, types} , page, key, value)
         break;
       case 'object':
+        console.log('key', key)
         value.forEach((aValue : string) => {
-          ret.push(`${api}/breweries?${key}=${aValue}`)
+          orsOrAnds({locations, types} , page, key, aValue)
         });
         break;
       default:
         throw new Error(" ");
-        
     }
   })
-  console.log('ret', ret)
-  return ret
+  return {locations, types};
+}
+
+/**
+ * @description returns Object of the breweries after ALL queries 
+ * @param queries the objects of queries
+ * @return JSON object with desired breweries
+ */
+export const transformQueriesToRequests = (queries : QUERIES, page: string) : string[] => {
+  const {locations, types} = destructorQueries(queries, page)
+  if(locations.length === 0) throw new Error("forgot to put locations");
+  if (types.length > 0) {
+    const requests : string[] = [];
+    types.forEach(type => locations.forEach( location => requests.push(`${location}${type}`)))
+    return requests;
+  } else {
+    return locations
+  }
 }
 
 export const reduceMultipleQueries = (unorganized : BREWERIES[]) : BREWERIES => {
@@ -61,6 +90,5 @@ export const reduceMultipleQueries = (unorganized : BREWERIES[]) : BREWERIES => 
   unorganized.forEach((response : BREWERIES) => {
     response.forEach((brewery : BREWERY) => (!ret.some((aBrewery : BREWERY) => aBrewery.id === brewery.id)) && ret.push(brewery))
   })
-  console.log('ret', ret.length)
   return ret;
 }

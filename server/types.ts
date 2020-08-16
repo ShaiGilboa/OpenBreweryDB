@@ -17,12 +17,15 @@ export interface BREWERY {
 export type BREWERIES = BREWERY[];
 
 export interface QUERIES {
-  by_city?: string[] | string,
-  by_name?: string,
-  by_state?: string[] | string,
-  by_postal?: string[] | string,
+  by_city?: string,
+  by_state?: string,
+  by_postal?: string,
   by_type?: string[] | string,
-  sort?: string,
 }
 
 export type QUERIES_INDEX = keyof QUERIES
+
+export interface LOCATIONS_TYPES {
+  locations: string[],
+  types: string[],
+}

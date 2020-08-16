@@ -7,9 +7,9 @@ import { breweriesHandler } from './handlers.routes';
 
 const router = express.Router()
 
-  .get('/breweries', breweriesHandler)
+  .get('/breweries/:page/:sort', breweriesHandler)
   
-  .get('/breweries/cities', async (req : express.Request, res : express.Response) : Promise<void> => {
+  .get('/breweries/name/:page/:sort', async (req : express.Request, res : express.Response) : Promise<void> => {
     try {
       console.log('req.query', req.query)
       res.send()

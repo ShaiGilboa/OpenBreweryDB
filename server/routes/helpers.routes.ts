@@ -47,6 +47,11 @@ const orsOrAnds = (info : LOCATIONS_TYPES, page: string, key: string, value: str
   }
 }
 
+/**
+ * 
+ * @param queries 
+ * @param page 
+ */
 const destructorQueries = (queries : QUERIES, page: string) : LOCATIONS_TYPES => {
   const locations: string[] = [];
   const types: string[] = [];
